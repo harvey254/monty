@@ -5,7 +5,7 @@
  * @line_number:
  * Return: no value
  */
-void add(stack_t **stack, unsigned int line_number)
+void _add(stack_t **stack, unsigned int line_number)
 {
     if (*stack == NULL || (*stack)->next == NULL)
     {
@@ -14,5 +14,5 @@ void add(stack_t **stack, unsigned int line_number)
     }
 
     (*stack)->next->n += (*stack)->n;
-    pop(stack, line_number);
+    _nop(stack, line_number);
 }
