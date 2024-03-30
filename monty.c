@@ -8,16 +8,16 @@
 
 stack_t *stack = NULL;
 
-int main(void)
+int main(int argc, char *argv[])
 {
-    char *line = NULL;
-    char *read;
-    unsigned int line_number = 0;
-    char *opcode = strtok(line, " \n");
-    int found = 0;
-    int i;
-
-    instruction_t instructions[] = {
+	char *line = NULL;
+	char *read;
+	unsigned int line_number = 0;
+	int found;
+	int i;
+	char *opcode = strtok(line, " \n");
+	FILE *file = fopen(argv[1], "r");
+	instruction_t instructions[] = {
         {"push", _push},
         {"pall", _pall},
         {"pint", _pint},
@@ -26,17 +26,30 @@ int main(void)
         {"add", _add},
         {"sub", _sub},
         {"div", div_op},
-        {"mul", _mul}, 
+        {"mul", _mul},
         {"nop", _nop},
         {NULL, NULL}
     };
-    read = fgets(line, sizeof(line), stdin);
 
-    while (read != NULL)
+
+    if (argc != 2)
+    {
+        fprintf(stderr, "USAGE: %s file\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    if (file == NULL)
+    {
+        fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
+        exit(EXIT_FAILURE);
+    }
+    while ((read = fgets(line, sizeof(line), file)) != NULL)
     {
         line_number++;
-        if (opcode == NULL || strlen(opcode) == 0 || opcode[0] == '#')
-            continue;
+	if (opcode == NULL || strlen(opcode) == 0 || opcode[0] == '#')
+            continue; 
+
+        found = 0;
         for (i = 0; instructions[i].opcode != NULL; i++)
         {
             if (strcmp(opcode, instructions[i].opcode) == 0)
@@ -47,10 +60,13 @@ int main(void)
             }
         }
         if (!found)
-            printf("L%d: unknown instruction %s\n", line_number, opcode);
+        {
+            fprintf(stderr, "L%d: unknown instruction %s\n", line_number, opcode);
+            exit(EXIT_FAILURE);
+        }
     }
 
     free(line);
-    free(stack);
-    return 0;
+    fclose(file);
+    return (0);
 }
